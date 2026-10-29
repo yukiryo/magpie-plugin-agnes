@@ -26,6 +26,6 @@
     "test": "node --test"
   },
   "magpie": {
-    "icon": "https://agnes-ai.com/favicon.ico"
+    "icon": "https://raw.githubusercontent.com/yukiryo/magpie-plugin-agnes/main/icon.png"
   }
 }
