@@ -1,11 +1,13 @@
 {
   "name": "opencode-agnes-auth",
-  "version": "0.1.0",
-  "description": "Agnes AI (agnes-ai.com) with your API key in OpenCode and magpie: chat, streaming, tools, image input and image generation",
+  "version": "0.2.0",
+  "description": "Agnes AI for Magpie and OpenCode: streaming chat, tools, images and asynchronous video with native API adapters",
   "type": "module",
   "main": "./index.mjs",
   "files": [
     "index.mjs",
+    "media.mjs",
+    "icon.png",
     "README.md",
     "LICENSE"
   ],
@@ -18,12 +20,16 @@
     "agnes-ai"
   ],
   "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/yukiryo/magpie-plugin-agnes.git"
   },
   "scripts": {
-    "test": "node --test"
+    "test": "node --test",
+    "check": "node scripts/check.mjs"
   },
   "magpie": {
     "icon": "https://raw.githubusercontent.com/yukiryo/magpie-plugin-agnes/main/icon.png"
