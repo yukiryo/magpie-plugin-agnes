@@ -1,91 +1,96 @@
 # Agnes AI for Magpie and OpenCode
 
-[Agnes AI](https://agnes-ai.com/) (SapiensAI) with your API key, in
-[magpie](https://usemagpie.ai) and OpenCode: text, code and image
-generation, through Agnes's OpenAI-compatible API at
-`https://apihub.agnes-ai.com/v1`.
+在 Magpie 中使用自己的 Agnes API key，完成聊天、编程、看图、图片生成和视频生成。
+这是非官方插件；包名保持 `opencode-agnes-auth`，账号标识保持 `agnes`。
 
-> 中文简介：用你自己的 Agnes AI API key，在 Magpie / OpenCode 里使用 Agnes 的文本与图像模型
-> （编码代理用 `agnes-2.5-flash`，图像生成用 `agnes-image-2.0/2.1/2.5-flash`）。
-> 安装方法见下文「Install in magpie」。
+## 安装
 
-This repository is the plugin package itself: its `package.json` is the
-root, so magpie installs it straight from here as the repository stands.
-
-## Install in magpie
-
-The plugin is **unofficial**: nobody has reviewed it but its author, and
-magpie says so where it lists it.
-
-1. Magpie → **Plugins › Discover**, scroll to **Unofficial, on GitHub**
-   （非官方插件 · GitHub）, find **Agnes AI**, and install it. The list
-   comes from GitHub's search, so a repository added recently can take a
-   while to show up there.
-2. Sign in with an **Agnes API key**: sign up at
-   [platform.agnes-ai.com](https://platform.agnes-ai.com/) (email, Google
-   or GitHub), create a key in the console's API-keys page, and paste it
-   on the plugin's sign-in.
-3. Pick a model: `agnes/agnes-2.5-flash` for a coding agent,
-   `agnes/agnes-image-2.1-flash` under **Settings › Images**.
-
-OpenCode users add it from git the same way (`magpie plugin add
-https://github.com/yukiryo/magpie-plugin-agnes` works there too — the
-plugins are OpenCode's), or point `plugin` in `opencode.json` at a local
-clone of this folder.
-
-## Models
-
-From Agnes's model catalog
-([MODEL_CATALOG.md](https://github.com/AgnesAI-Labs/AgnesAI-Models/blob/main/MODEL_CATALOG.md),
-2026-07-30) and the hub's own public `/v1/models` answer, which lists
-models the catalog's text doesn't yet:
-
-| Model | What it does |
-|---|---|
-| `agnes-2.5-flash` | The one for coding agents: 512K context, streaming, tool calling, reasoning, image understanding |
-| `agnes-2.0-flash` | The same shape at 256K context, as a compatibility fallback |
-| `agnes-2.5-pro-alpha`, `agnes-2.5-pro-beta` | The 2.5 Pro pair (beta is the text model on Artificial Analysis's index); the catalog gives no limits for them yet, so they serve text alone |
-| `agnes-3.0-flash` | Newer text model, served text alone until the catalog describes it |
-| `agnes-1.5-flash` | Fast chat only: no tool calling, no reasoning; takes an image URL |
-| `agnes-image-2.0-flash` | Text-to-image and image-to-image |
-| `agnes-image-2.1-flash` | Higher-density generation and image editing, URL or data-URI input |
-| `agnes-image-2.5-flash` | Newer image model, in the hub's own list |
-
-After signing in, the plugin replaces this table with whatever
-`GET /v1/models` answers, so a model Agnes adds shows up without a new
-plugin version. An id the catalog doesn't describe is served as text
-alone (or, when `image` is in its name, as an image model), and Agnes's
-`agnes-video-*` models stay out: they are an async API this plugin
-doesn't speak.
-
-## Image generation
-
-The image rows are marked the way magpie draws by, so in magpie they show
-under **Settings › Images** and to `generate_image`, and magpie asks them
-at `/v1/images/generations` — including following Agnes's own refusal of a
-chat request naming that API (yetone/magpie#1837). OpenCode lists them but
-has no drawing surface of its own.
-
-## Usage
-
-Agnes meters requests per plan (a free tier, and Token Plans billed per
-request). `/v1/models` answers the public catalog to any non-empty Bearer,
-so the usage hook checks the key at the one endpoint that refuses a bad
-one — the one-api-shaped `/v1/dashboard/billing/subscription` — and shows
-only the sign-in state: the billing fields' meaning under Agnes isn't
-documented, so it reads no balance into them. Spend and quota live in the
-[platform console](https://platform.agnes-ai.com/). The free tier caps
-text models at 30 requests a minute and 1K images at 30 a minute; the
-plans raise those (the catalog has the table).
-
-## Tests
+直接从本仓库安装：
 
 ```sh
-npm test        # node --test; bun test runs them too
+magpie plugin add https://github.com/yukiryo/magpie-plugin-agnes
+magpie plugin login agnes
 ```
 
-They call the hooks the way magpie and OpenCode do, with the vendor's
-answers faked; they sign in to nothing.
+登录时填写 [Agnes 平台控制台](https://platform.agnes-ai.com/) 创建的 API key。升级后继续沿用原有的 `agnes`
+账号和已保存的 key；图片选择器的标识变化见下文。
+
+已经安装的用户可在 Magpie 插件页更新，或运行 `magpie plugin update`。
+
+Windows 用户也可以下载或克隆本仓库，双击 `安装插件.cmd`，或在仓库目录运行
+`powershell -ExecutionPolicy Bypass -File .\install.ps1`。安装脚本会查找本机
+Magpie、安装插件并检查安装结果，账号登录仍通过上面的登录命令完成。
+
+聊天兼容 OpenCode 插件接口；图片和视频操作需要宿主提供相应入口。
+**视频需要 Magpie 0.1.2077 或更新版本。**
+
+## 模型与用法
+
+默认提供以下 8 个模型：
+
+| 选择器中的模型标识 | 用途 |
+| --- | --- |
+| `agnes-3.0-flash` | 聊天、流式回复、工具调用、看图 |
+| `agnes-2.5-flash` | 聊天、流式回复、工具调用、看图 |
+| `agnes-2.5-pro-beta` | 聊天、流式回复、工具调用、看图 |
+| `gpt-image-agnes-2.0-flash` | 图片生成与编辑 |
+| `gpt-image-agnes-2.1-flash` | 图片生成与编辑 |
+| `gpt-image-agnes-2.5-flash` | 图片生成与编辑 |
+| `agnes-video-2.5` | 视频生成 |
+| `agnes-video-2.5-flash` | 视频生成，720P、4 到 12 秒 |
+
+三个聊天模型均提供思考开关：`none` 关闭，`high` 开启。该设置对应 Agnes 的
+thinking 开关，不表示多档思考强度。
+
+插件可刷新 Agnes 的公共模型目录，目录内容可能与默认列表不同。
+已退役的 `agnes-2.0-flash` 和 `agnes-2.5-pro-alpha` 不再展示。
+公共目录只用于发现模型，不代表当前账号的额度或 key 状态。
+
+### 图片
+
+在 Magpie 的图片设置或图片生成入口选择 `gpt-image-agnes-*` 模型。
+这些标识是供选择器识别的别名，实际发给 Agnes 的请求会还原为
+`agnes-image-*`，例如 `gpt-image-agnes-2.5-flash` 对应
+`agnes-image-2.5-flash`。
+
+**从旧版升级后，请在图片设置中重新选择模型。** 旧的
+`agnes-image-2.0-flash`、`agnes-image-2.1-flash`、`agnes-image-2.5-flash`
+选择器标识已改为表中的三个别名。
+
+图片生成与编辑统一请求 `/v1/images/generations`。编辑支持 Magpie 发出的
+multipart 和 JSON 请求，参考图与返回格式按 Agnes 协议放入
+`extra_body.image` 和 `extra_body.response_format`。
+
+### 视频
+
+支持创建任务、查询进度和下载结果。任务标识携带真实的 `video_id` 和模型，
+重启后仍可继续查询，无需依赖内存中的任务记录。
+
+视频参考素材支持公开 URL；本地文件上传和 Data URI 参考暂不支持。
+Flash 模型仅支持 **720P、4 到 12 秒**。下载结果时不携带 Agnes API key。
+
+## 登录状态与账单
+
+插件通过 `/v1/dashboard/billing/subscription` 检查 key。
+`/v1/models` 是公共目录，即使返回模型也不能证明 key 有效。
+服务端明确返回 401 或 403 时，插件会将登录状态标记为已过期。
+
+插件仅展示登录状态。Agnes 未提供本插件能够确认含义的公开余额接口，
+余额、额度和账单请到 Agnes 平台控制台查看。
+
+## 维护与验证
+
+本仓库是插件的维护与分发来源。插件使用 ESM，运行时无需额外依赖或服务。
+
+```sh
+npm test
+npm run check
+npm pack --dry-run --ignore-scripts
+```
+
+测试使用模拟请求，不需要真实 API key，也不产生付费生成请求。
+本版本未使用有效 key 完成生产环境生成验证。
+CI 在 Windows、Ubuntu 的 Node.js 22 和 24 上执行以上检查。
 
 ## License
 
