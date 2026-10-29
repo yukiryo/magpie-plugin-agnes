@@ -50,3 +50,7 @@ in isolated Magpie 0.1.2075 configuration, including correct image API ids.
 No real account or paid generation was used. Independent review found no
 reproduced material defects. The community's upstream hook checker passed.
 Remote CI precedes merging into main.
+
+The repository's first PR did not start a workflow run. Maintenance-branch
+pushes now trigger the same read-only CI matrix directly, so the first
+release can be verified before its workflow reaches main.
