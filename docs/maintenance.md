@@ -28,7 +28,9 @@ the implementation and all validation.
   maintenance guidance; add Windows/Linux checks on Node 22 and 24.
 - [x] Verify the full suite, upstream plugin shape checker, exact npm package,
   and isolated Magpie loading; obtain independent code review.
-- [ ] Push an integration branch, run GitHub checks, and merge into main.
+- [x] Push an integration branch and create the integration PR.
+- [ ] Run GitHub checks (platform currently rejects workflow dispatch).
+- [x] Record release validation and remote-check limitations; PR #1 tracks integration into main.
 
 ## Review focus
 
@@ -44,13 +46,16 @@ Baseline: clean repository at b5aac47 on the isolated local clone. Existing
 19 tests passed in the comparison review. Implementation branch:
 `maintain/agnes-0.2.0`. No edits to running Magpie account configuration.
 
-Local verification: 92 tests passed, hook checks passed, package contains both
-runtime modules and the existing icon. The Windows installer loaded 8 models
-in isolated Magpie 0.1.2075 configuration, including correct image API ids.
-No real account or paid generation was used. Independent review found no
-reproduced material defects. The community's upstream hook checker passed.
-Remote CI precedes merging into main.
+Local verification: all 92 tests passed on Windows using Node.js 26.12.1 and
+Magpie's Bun 1.4.4. Hook checks and the community's upstream checker passed;
+the exact npm package imports both runtime modules and includes the icon.
+The Windows installer loaded 8 models in isolated Magpie 0.1.2075
+configuration, including correct image API ids. No real account or paid
+generation was used. Independent review found no reproduced material defects.
 
-The repository's first PR did not start a workflow run. Maintenance-branch
-pushes now trigger the same read-only CI matrix directly, so the first
-release can be verified before its workflow reaches main.
+The repository's first workflow was initialized on main independently of the
+feature update. GitHub then declined the explicit workflow dispatch, so no
+cloud matrix was executed. The read-only CI configuration is retained for
+when the platform becomes available. This release is merged using the two
+local-runtime test runs, isolated-host checks and independent review, with
+the unexecuted Node 22/24 and Linux matrix clearly documented.

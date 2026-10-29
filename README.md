@@ -90,7 +90,9 @@ npm pack --dry-run --ignore-scripts
 
 测试使用模拟请求，不需要真实 API key，也不产生付费生成请求。
 本版本未使用有效 key 完成生产环境生成验证。
-CI 在 Windows、Ubuntu 的 Node.js 22 和 24 上执行以上检查。
+CI 已配置为在 Windows、Ubuntu 的 Node.js 22 和 24 上执行以上检查。
+本次发布已在 Windows 的 Node.js 26.12.1 和 Magpie 自带的 Bun 1.4.4 上各通过
+92 项测试。GitHub Actions 当前不可用，本次未执行云端四组环境检查。
 
 ## License
 
